@@ -31,3 +31,11 @@ void shuffleDeck(Card deck[]) {
         swap(deck[i], deck[r]);
     }
 }
+
+// Deal cards
+void dealCards(Card deck[], Card hand[], int& deckIndex, int handSize) {
+    for (int i = 0; i < handSize; i++) {
+        hand[i] = deck[deckIndex++];
+    }
+}
+
