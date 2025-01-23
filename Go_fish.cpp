@@ -127,3 +127,203 @@ bool isValidCard(const string& value) {
     }
     return false;
 }
+
+// Main program
+int main() {
+    srand(time(0));
+
+    Card deck[DECK_SIZE];
+    Card playerHand[DECK_SIZE];
+    Card computerHand[DECK_SIZE];
+    string playerSets[13], computerSets[13];
+    int deckIndex = 0, playerHandSize = HAND_SIZE, computerHandSize = HAND_SIZE;
+    int playerSetSize = 0, computerSetSize = 0;
+
+    initializeDeck(deck);
+    shuffleDeck(deck);
+
+    // Deal cards
+    dealCards(deck, playerHand, deckIndex, HAND_SIZE);
+    dealCards(deck, computerHand, deckIndex, HAND_SIZE);
+
+    bool isPlayerTurn = true;
+
+    // First phase of the game
+    while (deckIndex < DECK_SIZE || playerHandSize > 0 || computerHandSize > 0) {
+        bool repeatTurn = true;
+
+        while (repeatTurn) {
+            if (playerSetSize == 13 || computerSetSize == 13) {
+                break;
+            }
+            repeatTurn = false;
+
+            if (isPlayerTurn) {
+                if (playerHandSize == 0 && deckIndex < DECK_SIZE) {
+                    playerHand[playerHandSize++] = deck[deckIndex++];
+                    cout << "Player had no cards and drew a card from the deck." << endl;
+                }
+
+                if (playerHandSize == 0) break;
+
+                cout << endl << "Your cards: ";
+                displayHand(playerHand, playerHandSize);
+
+                string ask;
+                do {
+                    cout << "Which card do you want to ask for? ";
+                    cin >> ask;
+                    if (!isValidCard(ask)) {
+                        cout << "Invalid input. Please enter a valid card name (e.g., Ace, King, etc.)." << endl;
+                    }
+                } while (!isValidCard(ask) || !hasCard(playerHand, playerHandSize, ask));
+
+                if (hasCard(computerHand, computerHandSize, ask)) {
+                    cout << "The computer has cards of " << ask << "!" << endl;
+                    transferCards(computerHand, computerHandSize, playerHand, playerHandSize, ask);
+                    repeatTurn = true;
+                }
+                else {
+                    cout << "The computer does not have cards of " << ask << ". You draw a card." << endl;
+                    string drawCommand;
+                    do {
+                        cout << "Type 'Draw' to proceed: ";
+                        cin >> drawCommand;
+                    } while (drawCommand != "Draw");
+                    if (deckIndex < DECK_SIZE) {
+                        Card drawnCard = deck[deckIndex++];
+                        playerHand[playerHandSize++] = drawnCard;
+                        cout << "You drew a card: " << drawnCard.value << endl;
+                        if (drawnCard.value == ask) {
+                            cout << "You drew " << ask << "! You can continue." << endl;
+                            repeatTurn = true;
+                        }
+                    }
+                }
+
+                checkForSet(playerHand, playerHandSize, playerSets, playerSetSize, true);
+            }
+            else {
+                if (computerHandSize == 0 && deckIndex < DECK_SIZE) {
+                    computerHand[computerHandSize++] = deck[deckIndex++];
+                    cout << "Computer had no cards and drew a card from the deck." << endl;
+                }
+
+                if (computerHandSize == 0) break;
+
+                string ask = computerHand[rand() % computerHandSize].value;
+                cout << "The computer asks for " << ask << "." << endl;
+
+                if (hasCard(playerHand, playerHandSize, ask)) {
+                    cout << "You give the cards of " << ask << " to the computer." << endl;
+                    transferCards(playerHand, playerHandSize, computerHand, computerHandSize, ask);
+                    repeatTurn = true;
+                }
+                else {
+                    cout << "You do not have cards of " << ask << ". The computer draws a card." << endl;
+                    if (deckIndex < DECK_SIZE) {
+                        Card drawnCard = deck[deckIndex++];
+                        computerHand[computerHandSize++] = drawnCard;
+                        if (drawnCard.value == ask) {
+                            cout << "The computer drew " << ask << " and continues." << endl;
+                            repeatTurn = true;
+                        }
+                    }
+                }
+
+                checkForSet(computerHand, computerHandSize, computerSets, computerSetSize, false);
+            }
+        }
+
+        isPlayerTurn = !isPlayerTurn;
+    }
+
+    // Start second phase
+    cout << "The first phase is over. Starting the second phase!" << endl;
+
+    while (true) {
+        // Clarify that this loop handles the second phase of the game, where players request sets until one player wins.
+        if (playerSetSize == 13 || computerSetSize == 13) {
+            break; // End the game if one player has all 13 sets
+        }
+
+        bool repeatTurn = true;
+
+        while (repeatTurn) {
+            repeatTurn = false;
+
+            if (playerSetSize == 13 || computerSetSize == 13) {
+                break; // End the game if one player has all 13 sets
+            }
+
+            if (isPlayerTurn) {
+                string ask;
+                do {
+                    cout << endl << "Your turn! Which set do you want to ask for? ";
+                    cin >> ask;
+                    if (!isValidCard(ask)) {
+                        cout << "Invalid input. Please enter a valid set name (e.g., Ace, King, etc.)." << endl;
+                    }
+                } while (!isValidCard(ask));
+
+                if (hasSet(computerSets, computerSetSize, ask)) {
+                    cout << "The computer gives you the set of " << ask << "!" << endl;
+                    playerSets[playerSetSize++] = ask;
+
+                    for (int i = 0; i < computerSetSize; i++) {
+                        if (computerSets[i] == ask) {
+                            computerSets[i] = computerSets[--computerSetSize];
+                            break;
+                        }
+                    }
+
+                    repeatTurn = true;
+                }
+                else {
+                    cout << "The computer does not have the set of " << ask << "." << endl;
+                }
+            }
+            else {
+                string ask;
+                do {
+                    ask = VALUES[rand() % 13];
+                } while (!isValidCard(ask));
+
+                cout << endl << "The computer asks for the set of " << ask << "." << endl;
+
+                if (hasSet(playerSets, playerSetSize, ask)) {
+                    cout << "You give the computer the set of " << ask << "!" << endl;
+                    computerSets[computerSetSize++] = ask;
+
+                    for (int i = 0; i < playerSetSize; i++) {
+                        if (playerSets[i] == ask) {
+                            playerSets[i] = playerSets[--playerSetSize];
+                            break;
+                        }
+                    }
+
+                    repeatTurn = true;
+                }
+                else {
+                    cout << "You do not have the set of " << ask << "." << endl;
+                }
+            }
+        }
+
+        isPlayerTurn = !isPlayerTurn;
+    }
+
+    // End game
+    cout << "The game is over!" << endl;
+    cout << "Your sets: " << playerSetSize << endl;
+    cout << "Computer's sets: " << computerSetSize << endl;
+
+    if (playerSetSize > computerSetSize) {
+        cout << "You win!" << endl;
+    }
+    else {
+        cout << "The computer wins!" << endl;
+    }
+
+    return 0;
+}
