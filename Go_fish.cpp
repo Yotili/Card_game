@@ -47,3 +47,23 @@ void displayHand(Card hand[], int size) {
     cout << endl;
 }
 
+// Check if a card exists in the hand
+bool hasCard(Card hand[], int size, const string& value) {
+    for (int i = 0; i < size; i++) {
+        if (hand[i].value == value) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Transfer cards between hands
+void transferCards(Card from[], int& fromSize, Card to[], int& toSize, const string& value) {
+    for (int i = 0; i < fromSize; i++) {
+        if (from[i].value == value) {
+            to[toSize++] = from[i];
+            from[i] = from[--fromSize];
+            i--; // Recheck the current index since elements are shifted
+        }
+    }
+}
