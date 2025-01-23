@@ -108,3 +108,13 @@ bool checkForSet(Card hand[], int& handSize, string sets[], int& setSize, bool i
     return foundSet;
 }
 
+// Check if a set exists in the player's sets
+bool hasSet(const string sets[], int setSize, const string& value) {
+    for (int i = 0; i < setSize; i++) {
+        if (sets[i] == value) {
+            return true;
+        }
+    }
+    return false;
+}
+
