@@ -67,3 +67,44 @@ void transferCards(Card from[], int& fromSize, Card to[], int& toSize, const str
         }
     }
 }
+
+// Check for a completed set
+bool checkForSet(Card hand[], int& handSize, string sets[], int& setSize, bool isPlayer) {
+    int counts[13] = { 0 };
+    for (int i = 0; i < handSize; i++) {
+        for (int j = 0; j < 13; j++) {
+            if (hand[i].value == VALUES[j]) {
+                counts[j]++;
+                break;
+            }
+        }
+    }
+
+    bool foundSet = false;
+    for (int i = 0; i < 13; i++) {
+        if (counts[i] == 4) {
+            sets[setSize++] = VALUES[i];
+            if (isPlayer) {
+                cout << "You have a full set of " << VALUES[i] << "!" << endl;
+                string confirmation;
+                do {
+                    cout << "Type 'Complete' to acknowledge: ";
+                    cin >> confirmation;
+                } while (confirmation != "Complete");
+            }
+            else {
+                cout << "The computer completes the set of " << VALUES[i] << "!" << endl;
+            }
+
+            for (int j = 0; j < handSize; j++) {
+                if (hand[j].value == VALUES[i]) {
+                    hand[j] = hand[--handSize];
+                    j--; // Recheck the current index
+                }
+            }
+            foundSet = true;
+        }
+    }
+    return foundSet;
+}
+
