@@ -118,3 +118,12 @@ bool hasSet(const string sets[], int setSize, const string& value) {
     return false;
 }
 
+// Validate if a card name is valid
+bool isValidCard(const string& value) {
+    for (const string& card : VALUES) {
+        if (card == value) {
+            return true;
+        }
+    }
+    return false;
+}
