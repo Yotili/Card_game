@@ -39,3 +39,11 @@ void dealCards(Card deck[], Card hand[], int& deckIndex, int handSize) {
     }
 }
 
+// Display the hand
+void displayHand(Card hand[], int size) {
+    for (int i = 0; i < size; i++) {
+        cout << hand[i].value << " ";
+    }
+    cout << endl;
+}
+
