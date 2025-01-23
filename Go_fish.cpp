@@ -23,3 +23,11 @@ void initializeDeck(Card deck[]) {
         }
     }
 }
+
+// Shuffle the deck
+void shuffleDeck(Card deck[]) {
+    for (int i = 0; i < DECK_SIZE; i++) {
+        int r = rand() % DECK_SIZE;
+        swap(deck[i], deck[r]);
+    }
+}
